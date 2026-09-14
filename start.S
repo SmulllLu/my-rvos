@@ -11,7 +11,8 @@ _start:
     la  sp, stacks+STACK_SIZE
 
     add sp, sp, t0
-
+    j start_kernel
+    
 park:
     wfi
     j park
