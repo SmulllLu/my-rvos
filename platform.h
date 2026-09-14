@@ -1,6 +1,9 @@
 #ifndef __PLATFORM_H__
 #define __PLATFORM_H__
 
-#define MAXNUM_CPU 8
+#define MAXNUM_CPU 8 // CPU core
+
+#define UART0 0x10000000L //UARTO init address
+
 
 #endif
