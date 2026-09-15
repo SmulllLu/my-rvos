@@ -7,5 +7,6 @@ SRCS_ASM = \
 SRCS_C = \
 	kernel.c \
 	uart.c \
+	printf.c \
 
 include ./common.mk
