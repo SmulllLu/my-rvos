@@ -1,12 +1,14 @@
+#include "os.h"
+
 extern void uart_init(void);
-extern void uart_puts(char *s);
-extern char uart_getc(void);
-extern int uart_putc(char ch);
+extern void page_init(void);
 
 void start_kernel(void){
 
-    uart_init();
+	uart_init();
 	uart_puts("Hello, RVOS!\n");
+
+	page_init();
 
     while (1) {
         char c = uart_getc();        // 阻塞等一个键
