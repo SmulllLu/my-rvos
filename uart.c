@@ -48,3 +48,8 @@ void uart_puts(char *s){
         uart_putc(*s++);
     }
 }
+
+char uart_getc(){
+    while ((uart_read_reg(LSR) & LSR_RX_READY)==0);
+    return uart_read_reg(RHR);
+}
