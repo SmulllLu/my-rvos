@@ -9,5 +9,6 @@ SRCS_C = \
 	uart.c \
 	page.c \
 	printf.c \
+	malloc.c \
 
 include ./common.mk

@@ -21,4 +21,8 @@ extern void panic(char *s);
 extern void *page_alloc(int npages);
 extern void page_free(void *p);
 
+/* malloc: 字节粒度的堆分配，建立在 page_alloc 之上 */
+extern void *malloc(size_t size);
+extern void free(void *ptr);
+
 #endif
