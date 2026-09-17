@@ -4,6 +4,9 @@ extern void uart_init(void);
 extern void page_init(void);
 extern void page_test(void);
 extern void malloc_test(void);
+extern void sched_init(void);
+extern void schedule(void);
+extern void os_main(void);
 
 void start_kernel(void){
 
@@ -13,6 +16,13 @@ void start_kernel(void){
 	page_init();
     page_test();
     malloc_test();
+
+	sched_init();// 初始化进程切换
+
+	os_main();
+
+	schedule();
+
 
     while (1) {
         char c = uart_getc();        // 阻塞等一个键
