@@ -149,3 +149,20 @@ void page_free(void *p){
         page++;
     }
 }
+
+void page_test()
+{
+	void *p = page_alloc(2);
+	printf("p = %p\n", p);
+	//page_free(p);
+
+	void *p2 = page_alloc(7);
+	printf("p2 = %p\n", p2);
+	page_free(p2);
+
+	void *p3 = page_alloc(4);
+	printf("p3 = %p\n", p3);
+
+    void *p4 = page_alloc(100);
+    printf("p4 = %p\n", p4);
+}
