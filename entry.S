@@ -73,6 +73,7 @@
 switch_to:
     csrrw   t6, mscratch,   t6  # 交换 t6 ↔ mscratch
     beqz    t6, 1f              # t6==0？→ 第一次切换，跳去恢复
+
     reg_save    t6              # 保存上一个任务的所有寄存器
     mv  t5, t6                  # t5 = t6 t5记住“旧任务上下体的地址”
     csrr    t6, mscratch        # 把真正的 t6 取回来
@@ -82,3 +83,28 @@ switch_to:
     mv      t6, a0              # t6 也指向它，当恢复的 base
     reg_restore t6              # 恢复新任务的全部寄存器
     ret                         # ra 已经是新任务的 ra → "跳"进新任务
+
+# 中断/异常入口：trap 发生时硬件把 PC 跳到 mtvec 指向的这里。
+# 进来时 mepc/mcause 已由硬件写好，mscratch 里是当前任务的 context 指针。
+.globl trap_vector
+.balign 4                       # trap 入口地址必须 4 字节对齐
+trap_vector:
+
+    csrrw   t6, mscratch,   t6  # 换出当前任务 context 地址当基址，t6 真身寄存在 mscratch
+    reg_save    t6              # 存 28 个寄存器（reg_save 宏里故意不含 t6）
+
+    mv      t5, t6              # t5 拿稳 context 地址
+    csrr    t6, mscratch        # 把 t6 真身取回来
+    STORE   t6, 30*SIZE_REG(t5) # 补存第 30 格——和 switch_to 同一个套路
+    csrw    mscratch,   t5      # mscratch 指回当前任务 context（刚被 t6 真身暂用）
+
+    csrr    a0, mepc            # 参数1：被打断的 PC
+    csrr    a1, mcause          # 参数2：trap 原因编号
+    call    trap_handler        # C 处理函数：trap_handler(epc, cause)
+
+    csrw    mepc,   a0          # 返回值 = 回去继续执行的地址（通常原样还回来）
+
+    csrr    t6, mscratch        # 重新取 context 地址（trap_handler 里可能切换了任务）
+    reg_restore t6              # 恢复全部 30 个寄存器
+
+    mret                        # 从 mepc 处"返回"，像什么都没发生

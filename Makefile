@@ -11,6 +11,7 @@ SRCS_C = \
 	page.c \
 	printf.c \
 	malloc.c \
+	trap.c \
 	sched.c \
 	user.c
 
