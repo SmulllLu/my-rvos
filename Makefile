@@ -15,6 +15,7 @@ SRCS_C = \
 	sched.c \
 	user.c \
 	plic.c \
-	timer.c
+	timer.c \
+	lock.c
 
 include ./common.mk

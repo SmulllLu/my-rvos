@@ -1,30 +1,38 @@
 #include "os.h"
 
-#define DELAY 1000
+#define DELAY 5000
+
+#define USE_LOCK
 
 void user_task0(void){
 	uart_puts("Task 0: Created!\n");
-	task_yield();
-	uart_puts("Task 0: I'm back!\n");
+	// task_yield();
+	// uart_puts("Task 0: I'm back!\n");
 	while (1) {
-		uart_puts("Task 0: Running...\n");
-		task_delay(DELAY);
+#ifdef USE_LOCK
+        spin_lock();
+#endif
+        uart_puts("Task 0: Begin...\n");
+        for(int i = 0; i<5 ; i++){
+		    uart_puts("Task 0: Running...\n");
+		    task_delay(DELAY);
+        }
+        uart_puts("Task 0: End...\n");
+#ifdef USE_LOCK
+        spin_unlock();
+#endif
 	}
 }
 
 void user_task1(void){
     uart_puts("Task 1: Created!\n");
     while (1) {
-        uart_puts("Task 1: Running...\n");
-        task_delay(DELAY);
-    }
-}
-
-void user_task2(void){
-    uart_puts("Task 2: Created!\n");
-    while (1) {
-        uart_puts("Task 2: Running...\n");
-        task_delay(DELAY);
+		uart_puts("Task 1: Begin ... \n");
+		for (int i = 0; i < 5; i++) {
+			uart_puts("Task 1: Running... \n");
+			task_delay(DELAY);
+		}
+		uart_puts("Task 1: End ... \n");
     }
 }
 
@@ -33,5 +41,5 @@ void os_main(void)
 {
 	task_create(user_task0);
 	task_create(user_task1);
-	task_create(user_task2);
+	//task_create(user_task2);
 }
