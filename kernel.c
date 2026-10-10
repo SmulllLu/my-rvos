@@ -8,6 +8,7 @@ extern void trap_init(void);
 extern void sched_init(void);
 extern void schedule(void);
 extern void os_main(void);
+extern void plic_init(void);
 
 void start_kernel(void){
 
@@ -19,7 +20,8 @@ void start_kernel(void){
     malloc_test();
 
     trap_init();
-
+    plic_init();
+    
 	sched_init();// 初始化进程切换
 
 	os_main();

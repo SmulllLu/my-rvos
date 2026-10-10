@@ -13,6 +13,7 @@ SRCS_C = \
 	malloc.c \
 	trap.c \
 	sched.c \
-	user.c
+	user.c \
+	plic.c
 
 include ./common.mk
