@@ -60,6 +60,9 @@ struct context {
 	reg_t t4;
 	reg_t t5;
 	reg_t t6;
+
+	// 保存下一个任务的pc
+	reg_t pc;
 };
 
 extern int  task_create(void (*task)(void));

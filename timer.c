@@ -1,5 +1,5 @@
 #include "os.h"
-
+extern void schedule(void); 
 /* interval ~= 1s */
 #define TIMER_INTERVAL CLINT_TIMEBASE_FREQ
 
@@ -17,8 +17,6 @@ void timer_init(){
     timer_load(TIMER_INTERVAL);
     // 开“定时器中断” 这一类
     w_mie(r_mie() | MIE_MTIE);
-    // 总开关（plic_init 里已开过，这里冗余无害）
-    w_mstatus(r_mstatus() | MSTATUS_MIE);
 }
 
 void timer_handler(){
@@ -27,4 +25,5 @@ void timer_handler(){
     printf("tick: %d\n", _tick);
     // 重新装填
     timer_load(TIMER_INTERVAL);
+    schedule(); 
 }

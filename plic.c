@@ -36,9 +36,6 @@ void plic_init(void)
 
 	/* 使能机器模式的外部中断（mie.MEIE 位）。 */
 	w_mie(r_mie() | MIE_MEIE);
-
-	/* 使能机器模式的全局中断总开关（mstatus.MIE 位）。 */
-	w_mstatus(r_mstatus() | MSTATUS_MIE);
 }
 
 /*

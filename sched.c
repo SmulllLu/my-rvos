@@ -14,6 +14,8 @@ static int _current = -1;
 
 void sched_init(){
     w_mscratch(0);
+    // 启用机器模式软件中断
+	w_mie(r_mie() | MIE_MSIE);
 }
 
 // 实现一个简单的循环 FIFO 调度器
@@ -31,8 +33,8 @@ void schedule(){
 // 创建一个task
 int task_create(void (*start_routin)(void)){
     if(_top < MAX_TASKS){
-        ctx_tasks[_top].sp = (reg_t) &task_stack[_top][STACK_SIZE];
-        ctx_tasks[_top].ra = (reg_t) start_routin;
+		ctx_tasks[_top].sp = (reg_t) &task_stack[_top][STACK_SIZE];
+		ctx_tasks[_top].pc = (reg_t) start_routin;
         _top++;
         return 0;
     }else{
@@ -40,9 +42,9 @@ int task_create(void (*start_routin)(void)){
     }
 }
 
-// task_yield() 会让调用的任务放弃 CPU，然后一个新的任务开始运行。
 void task_yield(){
-    schedule();
+	int id = r_mhartid();
+	*(uint32_t*)CLINT_MSIP(id) = 1;
 }
 
 // 一个非常粗糙的实现，只是为了消耗 CPU

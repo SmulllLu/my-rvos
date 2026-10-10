@@ -71,18 +71,15 @@
 .globl switch_to
 .balign 4
 switch_to:
-    csrrw   t6, mscratch,   t6  # 交换 t6 ↔ mscratch
-    beqz    t6, 1f              # t6==0？→ 第一次切换，跳去恢复
-
-    reg_save    t6              # 保存上一个任务的所有寄存器
-    mv  t5, t6                  # t5 = t6 t5记住“旧任务上下体的地址”
-    csrr    t6, mscratch        # 把真正的 t6 取回来
-    STORE   t6, 30*SIZE_REG(t5) # 旧任务的 t6 也存好 
-1:
-    csrw    mscratch,   a0      # mscratch 指向新任务的 context
+    csrw    mscratch,   a0
+    # 设置下一个任务的mepc到pc中
+    LOAD    a1, 31*SIZE_REG(a0)
+    csrw    mepc,   a1
+    
     mv      t6, a0              # t6 也指向它，当恢复的 base
     reg_restore t6              # 恢复新任务的全部寄存器
-    ret                         # ra 已经是新任务的 ra → "跳"进新任务
+    
+    mret                         # ra 已经是新任务的 ra → "跳"进新任务
 
 # 中断/异常入口：trap 发生时硬件把 PC 跳到 mtvec 指向的这里。
 # 进来时 mepc/mcause 已由硬件写好，mscratch 里是当前任务的 context 指针。
@@ -96,6 +93,10 @@ trap_vector:
     mv      t5, t6              # t5 拿稳 context 地址
     csrr    t6, mscratch        # 把 t6 真身取回来
     STORE   t6, 30*SIZE_REG(t5) # 补存第 30 格——和 switch_to 同一个套路
+
+    csrr    a0, mepc
+    STORE   a0, 31*SIZE_REG(t5)
+
     csrw    mscratch,   t5      # mscratch 指回当前任务 context（刚被 t6 真身暂用）
 
     csrr    a0, mepc            # 参数1：被打断的 PC
