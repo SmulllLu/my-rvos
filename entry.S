@@ -101,7 +101,8 @@ trap_vector:
 
     csrr    a0, mepc            # 参数1：被打断的 PC
     csrr    a1, mcause          # 参数2：trap 原因编号
-    call    trap_handler        # C 处理函数：trap_handler(epc, cause)
+    csrr	a2, mscratch        # 参数3：当前任务的 context 指针
+    call    trap_handler        # C 处理函数：trap_handler(epc, cause, ctx)
 
     csrw    mepc,   a0          # 返回值 = 回去继续执行的地址（通常原样还回来）
 

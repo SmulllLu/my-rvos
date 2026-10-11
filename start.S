@@ -21,9 +21,21 @@ _start:
 
     add sp, sp, t0                  # 挪到本核自己的栈上
 
-    li  t0, 3 << 11 | 1 << 7    # MPP=3（mret 后回 M 模式）+ MPIE=1（mret 后开中断）
-    csrs    mstatus, t0         # 给第一次 mret 手工准备"现场"（那是唯一没经过 trap 的 mret）
+#ifdef CONFIG_SYSCALL
+	li      t0, 0xffffffff  # 着一块代码是打开PMP，并且临时放行所有代码（真实项目中只给 U 模式开"用户代码 + 用户数据"那一小块，内核内存一律禁止。）
+	csrw    pmpaddr0, t0
+	li      t0, 0xf
+	csrw    pmpcfg0, t0
+#endif
 
+#ifdef CONFIG_SYSCALL
+	li	t0, 3 << 11
+	csrc	mstatus, t0
+#else
+	li	t0, 3 << 11 | 1 << 7
+	csrs	mstatus, t0
+#endif
+    
     j start_kernel              # 跳到 C 代码
 
 park:

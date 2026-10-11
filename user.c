@@ -1,4 +1,5 @@
 #include "os.h"
+#include "user_api.h"
 
 #define DELAY 5000
 
@@ -25,31 +26,59 @@ void timer_func(void *arg)
 	printf("======> TIMEOUT: %s: %d\n", param->str, param->counter);
 }
 
-void user_task0(void){
+// void user_task0(void){
+// 	uart_puts("Task 0: Created!\n");
+
+// 	/*
+// 	 * ch10：创建三个软件定时器，到期时间是「当前 tick + 3 / + 5 / + 7」。
+// 	 *
+// 	 * 这里 _tick 还是 0 —— 因为 task0 是第一次 schedule() 就轮到的任务。
+// 	 * 所以它们会正好在 tick 3 / 5 / 7 触发。
+// 	 * 关键：创建的那一刻 _tick 是多少，决定了后面所有一切。
+// 	 */
+// 	struct timer *t1 = timer_create(timer_func, &person, 3);
+// 	if (NULL == t1) {
+// 		printf("timer_create() failed!\n");
+// 	}
+// 	struct timer *t2 = timer_create(timer_func, &person, 5);
+// 	if (NULL == t2) {
+// 		printf("timer_create() failed!\n");
+// 	}
+// 	struct timer *t3 = timer_create(timer_func, &person, 7);
+// 	if (NULL == t3) {
+// 		printf("timer_create() failed!\n");
+// 	}
+
+// 	while (1) {
+// 		uart_puts("Task 0: Running...\n");
+// 		task_delay(DELAY);
+// 	}
+// }
+void user_task0(void)
+{
 	uart_puts("Task 0: Created!\n");
 
-	/*
-	 * ch10：创建三个软件定时器，到期时间是「当前 tick + 3 / + 5 / + 7」。
-	 *
-	 * 这里 _tick 还是 0 —— 因为 task0 是第一次 schedule() 就轮到的任务。
-	 * 所以它们会正好在 tick 3 / 5 / 7 触发。
-	 * 关键：创建的那一刻 _tick 是多少，决定了后面所有一切。
-	 */
-	struct timer *t1 = timer_create(timer_func, &person, 3);
-	if (NULL == t1) {
-		printf("timer_create() failed!\n");
-	}
-	struct timer *t2 = timer_create(timer_func, &person, 5);
-	if (NULL == t2) {
-		printf("timer_create() failed!\n");
-	}
-	struct timer *t3 = timer_create(timer_func, &person, 7);
-	if (NULL == t3) {
-		printf("timer_create() failed!\n");
-	}
+	unsigned int hid = -1;
 
-	while (1) {
-		uart_puts("Task 0: Running...\n");
+	/*
+	 * if syscall is supported, this will trigger exception,
+	 * code = 2 (Illegal instruction)
+	 */
+	//hid = r_mhartid();
+	//printf("hart id is %d\n", hid);
+    #ifdef CONFIG_SYSCALL
+        int ret = -1;
+        ret = gethid(&hid);
+        //ret = gethid(NULL);
+        if (!ret) {
+            printf("system call returned!, hart id is %d\n", hid);
+        } else {
+            printf("gethid() failed, return: %d\n", ret);
+        }
+    #endif
+
+	while (1){
+		uart_puts("Task 0: Running... \n");
 		task_delay(DELAY);
 	}
 }
