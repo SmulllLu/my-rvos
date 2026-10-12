@@ -57,10 +57,14 @@ endif
 	${CC} ${CFLAGS} ${LDFLAGS} -o ${ELF} $^
 	${OBJCOPY} -O binary ${ELF} ${BIN}
 
+# 源文件按 arch/ kernel/ mm/ ... 分了子目录，目标文件会带上同样的层级
+# （如 out/kernel/sched.o），先保证它所在的目录存在。
 ${OUTPUT_PATH}/%.o : %.c
+	@${MKDIR} $(@D)
 	${CC} ${DEFS} ${CFLAGS} -c -o $@ $<
 
 ${OUTPUT_PATH}/%.o : %.S
+	@${MKDIR} $(@D)
 	${CC} ${DEFS} ${CFLAGS} -c -o $@ $<
 
 run: all
