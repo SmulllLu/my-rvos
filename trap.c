@@ -66,9 +66,9 @@ reg_t trap_handler(reg_t epc, reg_t cause, struct context *cxt){
 			break;
 		default:
 			panic("OOPS! What can I do!");
+        }
     }
     return return_pc;
-    }
 }
 void trap_test()
 {
